@@ -11,8 +11,3 @@ sample.html을 변경하거나, 새로운 HTML파일을 제작해도 됩니다.
 1. 이 repo를 fork한 뒤
 2. 여러분의 개인 Repo에서 상품관리 API를 A-Z까지 작업하여 
 3. 개발이 끝나면 이 Repo에 PR을 보내어 제출을 완료해주세요.
-
-## Branch 명명 규칙
-1.  여러분 repo는 알아서 해주시고 😀(본인 레포니 main으로 하셔두 되져)
-2.  prgrms-be-devcourse/spring-board 레포로 PR시 branch는 본인 username을 적어주세요 :)  
-base repo : `여기repo` base : `username` ← head repo : `여러분repo` compare : `main`
