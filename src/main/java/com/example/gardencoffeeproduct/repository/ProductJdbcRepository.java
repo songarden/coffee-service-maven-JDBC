@@ -2,6 +2,7 @@ package com.example.gardencoffeeproduct.repository;
 
 import com.example.gardencoffeeproduct.model.Category;
 import com.example.gardencoffeeproduct.model.Product;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -40,17 +41,34 @@ public class ProductJdbcRepository implements ProductRepository {
 
     @Override
     public Optional<Product> findById(UUID productId) {
-        return Optional.empty();
+        try{
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject("SELECT * FROM products WHERE product_id = UUID_TO_BEAN(:productId)",
+                            Collections.singletonMap("productId",productId.toString().getBytes()),productRowMapper));
+        }
+        catch (EmptyResultDataAccessException e){
+            System.out.println(e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<Product> findByName(String productName) {
-        return Optional.empty();
+        try{
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject("SELECT * FROM products WHERE product_name = :productName",
+                            Collections.singletonMap("productName",productName),productRowMapper));
+        }
+        catch (EmptyResultDataAccessException e){
+            System.out.println(e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public List<Product> findByCategory(Category category) {
-        return null;
+        return jdbcTemplate.query("SELECT * FROM products WHERE category = :category",
+                Collections.singletonMap("category",category.toString()),productRowMapper);
     }
 
     @Override
@@ -73,7 +91,7 @@ public class ProductJdbcRepository implements ProductRepository {
         var paramMap = new HashMap<String,Object>();
         paramMap.put("productId", product.getProductId().toString().getBytes());
         paramMap.put("productName", product.getProductName());
-        paramMap.put("category", product.getCategory()).toString();
+        paramMap.put("category", product.getCategory().toString());
         paramMap.put("price", product.getPrice());
         paramMap.put("description", product.getDescription());
         paramMap.put("createdAt", product.getCreatedAt());

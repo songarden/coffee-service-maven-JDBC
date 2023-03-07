@@ -4,7 +4,6 @@ import com.example.gardencoffeeproduct.model.Category;
 import com.example.gardencoffeeproduct.model.Product;
 import com.wix.mysql.EmbeddedMysql;
 import com.wix.mysql.ScriptResolver;
-import com.wix.mysql.SqlScriptSource;
 import com.wix.mysql.config.Charset;
 import com.wix.mysql.distribution.Version;
 import org.junit.jupiter.api.*;
@@ -14,10 +13,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
-import static com.wix.mysql.config.MysqldConfig.*;
+import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -55,5 +54,13 @@ class ProductJdbcRepositoryTest {
         repository.insert(newProduct);
         var all = repository.findAll();
         assertThat(all.isEmpty(), is(false));
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("상품을 이름으로 조회할 수 있다.")
+    void testFindByName(){
+        var product = repository.findByName(newProduct.getProductName());
+        assertThat(product.isEmpty(), is(false));
     }
 }
