@@ -17,10 +17,12 @@ import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductJdbcRepositoryTest {
     static EmbeddedMysql embeddedMysql;
 
@@ -46,7 +48,7 @@ class ProductJdbcRepositoryTest {
     @Autowired
     ProductRepository repository;
 
-    private final Product newProduct = new Product(UUID.randomUUID(), "new-product", Category.COFFEE_BEAN_PACKAGE, 1000L);
+    private static final Product newProduct = new Product(UUID.randomUUID(), "new-product", Category.COFFEE_BEAN_PACKAGE, 1000L);
     @Test
     @Order(1)
     @DisplayName("상품을 추가할 수 있다.")
@@ -62,5 +64,38 @@ class ProductJdbcRepositoryTest {
     void testFindByName(){
         var product = repository.findByName(newProduct.getProductName());
         assertThat(product.isEmpty(), is(false));
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("상품을 ID로 조회할 수 있다.")
+    void testFindById(){
+        var product = repository.findById(newProduct.getProductId());
+        assertThat(product.isEmpty(), is(false));
+    }
+    @Test
+    @Order(4)
+    @DisplayName("상품을 카테고리로 조회할 수 있다.")
+    void testFindByCategory(){
+        var product = repository.findByCategory(Category.COFFEE_BEAN_PACKAGE);
+        assertThat(product.isEmpty(), is(false));
+    }
+    @Test
+    @Order(5)
+    @DisplayName("상품을 삭제할 수 있다.")
+    void testUpdateById(){
+        newProduct.setProductName("updated-name");
+        repository.update(newProduct);
+        var product = repository.findById(newProduct.getProductId());
+        assertThat(product.isEmpty(),is(false));
+        assertThat(product.get(),samePropertyValuesAs(newProduct));
+    }
+    @Test
+    @Order(6)
+    @DisplayName("상품을 삭제할 수 있다.")
+    void testDeleteAll(){
+        repository.deleteAll();
+        var findAll = repository.findAll();
+        assertThat(findAll.isEmpty(), is(true));
     }
 }
